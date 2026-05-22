@@ -9,6 +9,8 @@ use teloxide::prelude::*;
 use teloxide::adaptors::Throttle;
 use teloxide::requests::RequesterExt;
 use teloxide::adaptors::throttle::Limits;
+use teloxide::types::ThreadId;
+use teloxide::types::MessageId;
 
 const URLS: [&str; 3] = [
     "https://kills.deadlock.com/",
@@ -101,21 +103,30 @@ async fn watch(
     loop {
         match get_kills(&client, url, &regex).await {
             Ok(kills) => {
-                for text in kills.iter().rev() {
+                let mut new = Vec::new();
+
+                for text in &kills {
                     if Some(text) == last_seen.as_ref() {
                         break;
                     }
 
+                    new.push(text.clone());
+                }
+
+                for text in new.into_iter().rev() {
+                    println!("{}", text);
+
                     if let Err(err) = bot
-                        .send_message(ChatId(chat_id), text.clone())
+                        .send_message(ChatId(chat_id), text)
+                        .message_thread_id(ThreadId(MessageId(4)))
                         .await
                     {
                         eprintln!("telegram error: {}", err);
                     }
                 }
 
-                if let Some(last) = kills.last() {
-                    last_seen = Some(last.clone());
+                if let Some(first) = kills.first() {
+                    last_seen = Some(first.clone());
                 }
             }
 
