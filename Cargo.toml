@@ -1,0 +1,13 @@
+[package]
+name = "deadlock-killfeed-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.102"
+dotenvy = "0.15.7"
+reqwest = { version = "0.13.3", features = ["json"] }
+scraper = "0.27.0"
+teloxide = { version = "0.17.0", features = ["throttle"] }
+tokio = { version = "1.52.3", features = ["full"] }
+regex = "1.12.3"
